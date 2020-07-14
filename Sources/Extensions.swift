@@ -760,11 +760,7 @@ internal extension UIBarItem {
 extension UIView {
     static let swizzleAddSubview: Void = {
         let aClass: AnyClass! = object_getClass(UIView())
-        let originalMethod = class_getInstanceMethod(aClass, #selector(addSubview(_:)))
-        let newMehod = class_getInstanceMethod(aClass, #selector(swizzledAddSubview(_:)))
-        if let originalMethod = originalMethod, let newMehod = newMehod {
-            method_exchangeImplementations(originalMethod, newMehod)
-        }
+        swizzlingForClass(aClass, originalSelector: #selector(addSubview(_:)), swizzledSelector: #selector(swizzledAddSubview(_:)))
     }()
 
     @objc func swizzledAddSubview(_ subview: UIView) {
@@ -778,17 +774,29 @@ extension UIView {
 extension CALayer {
     static let swizzleAddSublayer: Void = {
         let aClass: AnyClass! = object_getClass(CALayer())
-        let originalMethod = class_getInstanceMethod(aClass, #selector(addSublayer(_:)))
-        let newMehod = class_getInstanceMethod(aClass, #selector(swizzledAddSublayer(_:)))
-        if let originalMethod = originalMethod, let newMehod = newMehod {
-            method_exchangeImplementations(originalMethod, newMehod)
-        }
+        swizzlingForClass(aClass, originalSelector: #selector(addSublayer(_:)), swizzledSelector: #selector(swizzledAddSublayer(_:)))
     }()
 
     @objc func swizzledAddSublayer(_ sublayer: CALayer) {
         swizzledAddSublayer(sublayer)
         if overrideThemeStyle != nil {
             sublayer.overrideThemeStyle = overrideThemeStyle
+        }
+    }
+}
+
+extension NSObject {
+    static func swizzlingForClass(_ forClass: AnyClass, originalSelector: Selector, swizzledSelector: Selector) {
+        guard let originalMethod = class_getInstanceMethod(forClass, originalSelector),
+              let swizzledMethod = class_getInstanceMethod(forClass, swizzledSelector) else {
+            return
+        }
+        
+        let isAddSuccess = class_addMethod(forClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+        if isAddSuccess {
+            class_replaceMethod(forClass, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+        } else {
+            method_exchangeImplementations(originalMethod, swizzledMethod)
         }
     }
 }
