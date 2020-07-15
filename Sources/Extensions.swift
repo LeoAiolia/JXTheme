@@ -691,7 +691,7 @@ internal extension UIView {
             if objc_getAssociatedObject(self, &AssociatedKey.providers) == nil {
                 self.providers = [String: Any]()
             }
-            return objc_getAssociatedObject(self, &AssociatedKey.providers) as! [String: Any]
+            return (objc_getAssociatedObject(self, &AssociatedKey.providers) as? [String: Any]) ?? [:]
         }
     }
     var overrideThemeStyle: ThemeStyle? {
@@ -717,7 +717,7 @@ internal extension CALayer {
             if objc_getAssociatedObject(self, &AssociatedKey.providers) == nil {
                 self.providers = [String: Any]()
             }
-            return objc_getAssociatedObject(self, &AssociatedKey.providers) as! [String: Any]
+            return (objc_getAssociatedObject(self, &AssociatedKey.providers) as? [String: Any]) ?? [:]
         }
     }
     var overrideThemeStyle: ThemeStyle? {
@@ -743,7 +743,7 @@ internal extension UIBarItem {
             if objc_getAssociatedObject(self, &AssociatedKey.providers) == nil {
                 self.providers = [String: Any]()
             }
-            return objc_getAssociatedObject(self, &AssociatedKey.providers) as! [String: Any]
+            return (objc_getAssociatedObject(self, &AssociatedKey.providers) as? [String: Any]) ?? [:]
         }
     }
     var overrideThemeStyle: ThemeStyle? {
@@ -759,7 +759,7 @@ internal extension UIBarItem {
 //MARK: - Swizzle
 extension UIView {
     static let swizzleAddSubview: Void = {
-        let aClass: AnyClass! = object_getClass(UIView())
+        guard let aClass: AnyClass = object_getClass(UIView()) else { return }
         swizzlingForClass(aClass, originalSelector: #selector(addSubview(_:)), swizzledSelector: #selector(swizzledAddSubview(_:)))
     }()
 
@@ -773,7 +773,7 @@ extension UIView {
 
 extension CALayer {
     static let swizzleAddSublayer: Void = {
-        let aClass: AnyClass! = object_getClass(CALayer())
+        guard let aClass: AnyClass = object_getClass(CALayer()) else { return }
         swizzlingForClass(aClass, originalSelector: #selector(addSublayer(_:)), swizzledSelector: #selector(swizzledAddSublayer(_:)))
     }()
 
