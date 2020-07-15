@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "JXTheme"
-  s.version = "0.0.7"
+  s.version = "0.0.8"
   s.summary      = "A powerful and lightweight and customization theme/skin library for iOS 9+ in swift. 主题、换肤、暗黑模式"
   s.homepage     = "https://github.com/LeoAiolia/JXTheme"
   s.license      = "MIT"
